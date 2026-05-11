@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Test registro</title>
+</head>
+<body>
+
+  <h2>Prueba de registro — Profesional</h2>
+
+  <form id="form-test">
+    <input type="hidden" name="tipo" value="profesional">
+
+    <p><input type="text"     name="nombre"       placeholder="Nombre"       required></p>
+    <p><input type="text"     name="apellidos"     placeholder="Apellidos"    required></p>
+    <p><input type="email"    name="email"         placeholder="Email"        required></p>
+    <p><input type="tel"      name="telefono"      placeholder="Teléfono"></p>
+    <p><input type="password" name="password"      placeholder="Contraseña"   required></p>
+    <p><input type="text"     name="descripcion"   placeholder="Descripción"></p>
+    <p><input type="text"     name="skills"        placeholder="Skills (separados por comas)"></p>
+    <p><input type="url"      name="portfolio_link" placeholder="Link portfolio"></p>
+
+    <p>
+      <select name="categoria_id">
+        <option value="1">Fotógrafo</option>
+        <option value="2">Videógrafo</option>
+      </select>
+    </p>
+
+    <p><button type="submit">Registrar</button></p>
+  </form>
+
+  <p id="resultado"></p>
+
+  <script>
+    document.getElementById('form-test').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(e.target);
+      const resultado = document.getElementById('resultado');
+      resultado.textContent = 'Enviando...';
+
+      try {
+        const res = await fetch('php/registro.php', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+
+        if (data.ok) {
+          resultado.textContent = '✅ Registro correcto';
+          resultado.style.color = 'green';
+        } else {
+          resultado.textContent = '❌ Error: ' + data.error;
+          resultado.style.color = 'red';
+        }
+      } catch (err) {
+        resultado.textContent = '❌ Error de conexión';
+        resultado.style.color = 'red';
+      }
+    });
+  </script>
+
+</body>
+</html>
