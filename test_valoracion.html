@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Test valoración</title>
+</head>
+<body>
+
+  <h2>Prueba de valoración — Solo DKZ</h2>
+
+  <form id="form-valoracion">
+    <p><input type="number" name="profesional_id" placeholder="ID del profesional" min="1" required></p>
+    <p><input type="number" name="puntuacion" placeholder="Puntuación (1-5)" min="1" max="5" required></p>
+    <p><textarea name="comentario" placeholder="Comentario (opcional)" rows="3"></textarea></p>
+    <p><input type="text" name="administrador" placeholder="Nombre del administrador" required></p>
+    <p><button type="submit">Enviar valoración</button></p>
+  </form>
+
+  <p id="resultado"></p>
+
+  <script>
+    document.getElementById('form-valoracion').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(e.target);
+      const resultado = document.getElementById('resultado');
+      resultado.textContent = 'Enviando...';
+
+      try {
+        const res = await fetch('php/valorar_profesional.php', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+
+        if (data.ok) {
+          resultado.textContent = '✅ Valoración guardada correctamente';
+          resultado.style.color = 'green';
+        } else {
+          resultado.textContent = '❌ Error: ' + data.error;
+          resultado.style.color = 'red';
+        }
+      } catch (err) {
+        resultado.textContent = '❌ Error de conexión';
+        resultado.style.color = 'red';
+      }
+    });
+  </script>
+
+</body>
+</html>
