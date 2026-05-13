@@ -33,6 +33,24 @@ try {
         $descripcion  = trim($_POST['descripcion'] ?? '');
         $skills       = trim($_POST['skills'] ?? '');
         $portfolioLink = trim($_POST['portfolio_link'] ?? '');
+        $foto = null;
+
+if (!empty($_FILES['foto']['name'])) {
+    $extensionesPermitidas = ['jpg', 'jpeg', 'png', 'webp'];
+    $ext = strtolower(pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION));
+    
+    if (!in_array($ext, $extensionesPermitidas)) {
+        echo json_encode(['error' => 'La foto debe ser jpg, jpeg, png o webp']);
+        exit;
+    }
+    
+    $nombreFoto = uniqid('foto_') . '.' . $ext;
+    $rutaDestino = '../uploads/portfolio/' . $nombreFoto;
+    
+    if (move_uploaded_file($_FILES['foto']['tmp_name'], $rutaDestino)) {
+        $foto = $nombreFoto;
+    }
+}
 
         if (!$categoria_id || !is_numeric($categoria_id)) {
             echo json_encode(['error' => 'Debes seleccionar una categoría']);
@@ -40,9 +58,9 @@ try {
         }
 
         $stmt2 = $pdo->prepare("INSERT INTO profesionales 
-            (usuario_id, categoria_id, descripcion, estado) 
-            VALUES (?, ?, ?, 'pendiente')");
-        $stmt2->execute([$usuarioId, $categoria_id, $descripcion]);
+            (usuario_id, categoria_id, descripcion, estado, foto) 
+            VALUES (?, ?, ?, 'pendiente', ?)");
+        $stmt2->execute([$usuarioId, $categoria_id, $descripcion, $foto]);
         $profesionalId = $pdo->lastInsertId();
 
         if ($skills) {
