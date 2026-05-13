@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Test solicitud</title>
+</head>
+<body>
+
+  <h2>Prueba de solicitud</h2>
+
+  <form id="form-solicitud">
+    <p><input type="number" name="cliente_id" placeholder="ID del cliente" required></p>
+    <p><input type="number" name="profesional_id" placeholder="ID del profesional" required></p>
+    <p><textarea name="descripcion" placeholder="Describe qué necesitas..." rows="3" required></textarea></p>
+    <p><input type="date" name="fecha_necesidad"></p>
+    <p><button type="submit">Enviar solicitud</button></p>
+  </form>
+
+  <p id="resultado"></p>
+
+  <script>
+    document.getElementById('form-solicitud').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(e.target);
+      const resultado = document.getElementById('resultado');
+      resultado.textContent = 'Enviando...';
+
+      try {
+        const res = await fetch('php/crear_solicitud.php', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+
+        if (data.ok) {
+          resultado.textContent = '✅ Solicitud enviada correctamente';
+          resultado.style.color = 'green';
+        } else {
+          resultado.textContent = '❌ Error: ' + data.error;
+          resultado.style.color = 'red';
+        }
+      } catch (err) {
+        resultado.textContent = '❌ Error de conexión';
+        resultado.style.color = 'red';
+      }
+    });
+  </script>
+
+</body>
+</html>
