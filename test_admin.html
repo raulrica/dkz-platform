@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Admin — DKZ</title>
+</head>
+<body>
+
+  <h2>Panel de Administración — DKZ</h2>
+
+  <h3>Profesionales pendientes</h3>
+  <div id="lista-pendientes"></div>
+
+  <hr>
+
+  <h3>Aprobar o rechazar profesional</h3>
+  <form id="form-aprobar">
+    <p><input type="number" name="profesional_id" placeholder="ID del profesional" required></p>
+    <p>
+      <select name="estado">
+        <option value="aprobado">Aprobar</option>
+        <option value="rechazado">Rechazar</option>
+      </select>
+    </p>
+    <p><input type="text" name="administrador" placeholder="Tu nombre" required></p>
+    <p><button type="submit">Confirmar</button></p>
+  </form>
+  <p id="resultado-aprobar"></p>
+
+  <hr>
+
+  <h3>Solicitudes pendientes</h3>
+  <div id="lista-solicitudes"></div>
+
+  <script>
+    // Cargar profesionales pendientes
+    async function cargarPendientes() {
+      const res = await fetch('php/admin_profesionales.php?estado=pendiente');
+      const data = await res.json();
+      const div = document.getElementById('lista-pendientes');
+
+      if (data.ok && data.datos.length > 0) {
+        div.innerHTML = data.datos.map(p => `
+          <p><strong>ID: ${p.id}</strong> — ${p.nombre} ${p.apellidos} 
+          — ${p.categoria} — ${p.email}</p>
+        `).join('');
+      } else {
+        div.innerHTML = '<p>No hay profesionales pendientes</p>';
+      }
+    }
+
+    // Cargar solicitudes pendientes
+    async function cargarSolicitudes() {
+      const res = await fetch('php/admin_solicitudes.php?accion=listar&estado=pendiente');
+      const data = await res.json();
+      const div = document.getElementById('lista-solicitudes');
+
+      if (data.ok && data.datos.length > 0) {
+        div.innerHTML = data.datos.map(s => `
+          <p><strong>ID: ${s.id}</strong> — 
+          Cliente: ${s.cliente_nombre} ${s.cliente_apellidos} → 
+          Profesional: ${s.profesional_nombre} ${s.profesional_apellidos} — 
+          ${s.descripcion}</p>
+        `).join('');
+      } else {
+        div.innerHTML = '<p>No hay solicitudes pendientes</p>';
+      }
+    }
+
+    // Aprobar o rechazar profesional
+    document.getElementById('form-aprobar').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const resultado = document.getElementById('resultado-aprobar');
+
+      const res = await fetch('php/admin_aprobar.php', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+
+      if (data.ok) {
+        resultado.textContent = '✅ ' + data.mensaje;
+        resultado.style.color = 'green';
+        cargarPendientes();
+      } else {
+        resultado.textContent = '❌ ' + data.error;
+        resultado.style.color = 'red';
+      }
+    });
+
+    cargarPendientes();
+    cargarSolicitudes();
+  </script>
+
+</body>
+</html>
