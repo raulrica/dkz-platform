@@ -41,9 +41,18 @@ try {
     ");
     $stmtPortfolio->execute([$profesional_id]);
     $portfolio = $stmtPortfolio->fetchAll(PDO::FETCH_ASSOC);
+    $stmtValoraciones = $pdo->prepare("
+    SELECT puntuacion, comentario, administrador, created_at 
+    FROM valoraciones 
+    WHERE profesional_id = ?
+    ORDER BY created_at DESC
+");
+$stmtValoraciones->execute([$profesional_id]);
+$valoraciones = $stmtValoraciones->fetchAll(PDO::FETCH_ASSOC);
 
-    $profesional['skills']    = $skills;
-    $profesional['portfolio'] = $portfolio;
+$profesional['skills']      = $skills;
+$profesional['portfolio']   = $portfolio;
+$profesional['valoraciones'] = $valoraciones;
 
     echo json_encode(['ok' => true, 'datos' => $profesional]);
 
