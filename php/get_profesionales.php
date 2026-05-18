@@ -8,7 +8,7 @@ try {
     if ($categoria_id && is_numeric($categoria_id)) {
         $stmt = $pdo->prepare("
             SELECT u.nombre, u.apellidos, p.id, p.descripcion, 
-                   p.valoracion_media, c.nombre AS categoria
+                   p.valoracion_media, p.foto, c.nombre AS categoria
             FROM profesionales p
             JOIN usuarios u ON u.id = p.usuario_id
             JOIN categorias c ON c.id = p.categoria_id
@@ -20,7 +20,7 @@ try {
     } else {
         $stmt = $pdo->prepare("
             SELECT u.nombre, u.apellidos, p.id, p.descripcion, 
-                   p.valoracion_media, c.nombre AS categoria
+                   p.valoracion_media, p.foto, c.nombre AS categoria
             FROM profesionales p
             JOIN usuarios u ON u.id = p.usuario_id
             JOIN categorias c ON c.id = p.categoria_id
