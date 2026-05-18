@@ -25,4 +25,3 @@ try {
             JOIN usuarios u_cliente ON u_cliente.id = cl.usuario_id
             JOIN profesionales p ON p.id = s.profesional_id
             JOIN
-            
